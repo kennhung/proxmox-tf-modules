@@ -1,0 +1,25 @@
+#cloud-config
+
+hostname: ${hostname}
+fqdn: ${hostname}.lan
+manage_etc_hosts: false
+
+user: ${username}
+password: ${password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+
+package_upgrade: true
+packages:
+  - qemu-guest-agent
+%{ if length(additional_packages) != 0 }  - ${join("\n  - ", additional_packages)}%{ endif }
+runcmd:
+  - - systemctl
+    - enable
+    - --now
+    - qemu-guest-agent.service
+%{ if apt_mirror != "" }apt:
+  primary:
+    - arches: [default]
+      uri: ${apt_mirror}%{ endif }
