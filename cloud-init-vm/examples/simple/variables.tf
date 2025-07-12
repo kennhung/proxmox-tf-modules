@@ -30,3 +30,7 @@ variable "bootdisk_file_id" {
 variable "cloud_init_datastore_id" {
   type = string
 }
+
+variable "apt_mirror" {
+  type        = string
+}

@@ -23,4 +23,6 @@ module "cloud_init_vm" {
   }
 
   cloud_init_datastore_id = var.cloud_init_datastore_id
+
+  apt_mirror = var.apt_mirror
 }
