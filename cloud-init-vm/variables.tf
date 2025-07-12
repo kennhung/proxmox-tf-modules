@@ -71,7 +71,7 @@ variable "bootdisk" {
 
 variable "cloud_init_datastore_id" {
   type        = string
-  description = "Datastore ID for the Cloud-Init ISO."
+  description = "Datastore ID for the Cloud-Init configuration."
 }
 
 variable "userdata_file_datastore_id" {
