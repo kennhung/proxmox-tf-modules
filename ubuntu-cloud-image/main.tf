@@ -30,6 +30,10 @@ locals {
   cloud_image_serial   = data.external.image_build_info.result.serial
 }
 
+resource "random_pet" "random_pet" {
+  length = 1
+}
+
 resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
   depends_on = [
     data.external.image_build_info,
@@ -41,7 +45,7 @@ resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
   overwrite_unmanaged = false
 
   url       = local.cloud_image_url
-  file_name = "ubuntu-${var.ubuntu_version}-${local.cloud_image_serial}-server-cloudimg-${var.architecture}.img"
+  file_name = "ubuntu-${var.ubuntu_version}-${local.cloud_image_serial}-server-cloudimg-${var.architecture}-${random_pet.random_pet.id}.img"
 
   checksum           = local.cloud_image_checksum
   checksum_algorithm = "sha256"
