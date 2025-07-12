@@ -11,6 +11,7 @@ chpasswd:
 ssh_pwauth: true
 
 package_upgrade: true
+package_reboot_if_required: true
 packages:
   - qemu-guest-agent
 %{ if length(additional_packages) != 0 }  - ${join("\n  - ", additional_packages)}%{ endif }
