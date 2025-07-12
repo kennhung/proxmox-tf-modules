@@ -24,5 +24,8 @@ module "cloud_init_vm" {
 
   cloud_init_datastore_id = var.cloud_init_datastore_id
 
-  apt_mirror = var.apt_mirror
+  apt_mirror    = var.apt_mirror
+  password      = "ubuntu"
+  ssh_import_id = var.ssh_import_id
+  ssh_key       = var.ssh_key
 }

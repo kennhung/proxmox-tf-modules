@@ -88,9 +88,21 @@ variable "username" {
 
 variable "password" {
   type        = string
-  description = "Password for the Cloud-Init user. Defaults to 'ubuntu'."
-  default     = "ubuntu"
+  description = "Password for the Cloud-Init user."
+  default     = ""
   sensitive   = true
+}
+
+variable "ssh_key" {
+  type        = string
+  description = "SSH public key for the Cloud-Init user."
+  default     = ""
+}
+
+variable "ssh_import_id" {
+  type        = string
+  description = "SSH import ID for the Cloud-Init user."
+  default     = ""
 }
 
 variable "additional_packages" {

@@ -5,10 +5,14 @@ fqdn: ${hostname}.lan
 manage_etc_hosts: false
 
 user: ${username}
-password: ${password}
+%{ if ssh_key != "" }ssh_authorized_keys:
+  - ${ssh_key}%{ endif }
+%{ if ssh_import_id != "" }ssh_import_id:
+  - ${ssh_import_id}%{ endif }
+%{ if password != "" }password: ${password}
 chpasswd:
   expire: false
-ssh_pwauth: true
+ssh_pwauth: true%{ endif }
 
 package_upgrade: true
 package_reboot_if_required: true

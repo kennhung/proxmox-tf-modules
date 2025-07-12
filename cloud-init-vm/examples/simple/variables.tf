@@ -32,5 +32,13 @@ variable "cloud_init_datastore_id" {
 }
 
 variable "apt_mirror" {
-  type        = string
+  type = string
+}
+
+variable "ssh_key" {
+  type = string
+}
+
+variable "ssh_import_id" {
+  type = string
 }
