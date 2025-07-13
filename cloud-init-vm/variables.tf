@@ -76,8 +76,8 @@ variable "cloud_init_datastore_id" {
 
 variable "userdata_file_datastore_id" {
   type        = string
-  description = "Datastore ID for the userdata file. Defaults to 'local'."
-  default     = "local"
+  description = "Datastore ID for the userdata file."
+  default     = ""
 }
 
 variable "username" {

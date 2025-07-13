@@ -1,3 +1,21 @@
+module "userdata_file" {
+  source = "../cloud-init-userdata"
+
+  node_name    = var.node_name
+  datastore_id = var.userdata_file_datastore_id
+  file_name    = "${var.vmid}-userdata.yaml"
+
+  hostname = var.name
+
+  username      = var.username
+  password      = var.password
+  ssh_key       = var.ssh_key
+  ssh_import_id = var.ssh_import_id
+
+  additional_packages = var.additional_packages
+  apt_mirror          = var.apt_mirror
+}
+
 resource "proxmox_virtual_environment_vm" "proxmox_vm" {
   node_name = var.node_name
   vm_id     = var.vmid
@@ -80,28 +98,6 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
       servers = var.dns_servers
     }
 
-    user_data_file_id = proxmox_virtual_environment_file.cloud_init_userdata.id
-  }
-}
-
-resource "proxmox_virtual_environment_file" "cloud_init_userdata" {
-  node_name    = var.node_name
-  datastore_id = var.userdata_file_datastore_id
-  content_type = "snippets"
-
-  source_raw {
-    data = templatefile("${path.module}/userdata.tftpl", {
-      hostname = var.name
-
-      username      = var.username
-      password      = var.password
-      ssh_key       = var.ssh_key
-      ssh_import_id = var.ssh_import_id
-
-      additional_packages = var.additional_packages
-      apt_mirror          = var.apt_mirror
-    })
-
-    file_name = "${var.vmid}-userdata.yaml"
+    user_data_file_id = module.userdata_file.userdata_file_id
   }
 }
