@@ -39,13 +39,38 @@ jobs:
         run: terraform validate
 
   tflint:
-    name: TFLint
+    name: TFLint (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - cloud-init-userdata
+          - cloud-init-vm
+          - haproxy-server
+          - talos-disk-image
+          - talos-iso
+          - ubuntu-cloud-image
+          - ubuntu-lxc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init
+      - run: tflint --chdir ${{ matrix.module }}
+
+  tflint-examples:
+    name: TFLint Examples
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init
-      - run: tflint --recursive
+      - name: Run TFLint on example directories
+        run: |
+          find . -path "*/examples/*" -name "*.tf" -exec dirname {} \; | sort -u | while read -r dir; do
+            echo "Linting $dir"
+            tflint --chdir "$dir" --config "$GITHUB_WORKSPACE/.tflint.example.hcl"
+          done
 
   checkov:
     name: Checkov
