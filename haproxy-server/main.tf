@@ -81,8 +81,8 @@ resource "null_resource" "haproxy_ansible" {
         # set, Ansible would prefer password auth (via sshpass) over the agent.
         var.password != null && var.ssh_private_key == null ? { ansible_password = var.password } : {},
       ))
-      ANSIBLE_USER              = var.ssh_user
-      SSH_PRIVATE_KEY_CONTENT   = var.ssh_private_key != null ? var.ssh_private_key : ""
+      ANSIBLE_USER            = var.ssh_user
+      SSH_PRIVATE_KEY_CONTENT = var.ssh_private_key != null ? var.ssh_private_key : ""
       # accept-new trusts a host on first connect but rejects changed keys
       # on subsequent connects; UserKnownHostsFile=/dev/null prevents stale
       # entries on persistent runners from causing spurious failures.
