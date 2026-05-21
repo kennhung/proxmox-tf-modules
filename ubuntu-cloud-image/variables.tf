@@ -1,32 +1,40 @@
-variable "cloud_image_repository_url" {
+# Required Variables
+variable "proxmox_node_name" {
+  description = "The name of the Proxmox node where the cloud image will be stored."
   type        = string
-  description = "URL for Ubuntu Cloud Images. Defaults to the official Ubuntu Cloud Images repository."
+  nullable    = false
+}
+
+# Optional Variables
+variable "cloud_image_mirror" {
+  description = "The URL of the Ubuntu cloud image mirror."
+  type        = string
   default     = "https://cloud-images.ubuntu.com"
+  nullable    = false
 }
 
 variable "ubuntu_version" {
-  type        = string
   description = "The version of the Ubuntu image to download."
+  type        = string
+  default     = null
 }
 
 variable "architecture" {
+  description = "The architecture of the Ubuntu image to download."
   type        = string
-  description = "The architecture of the Ubuntu image to download. Defaults to 'amd64'."
   default     = "amd64"
+  nullable    = false
 }
 
-variable "serial" {
+variable "build_serial" {
+  description = "The build serial number for the Ubuntu cloud image."
   type        = string
-  description = "The serial of the Ubuntu image. Defaults to an empty string, which means the latest build will be used."
-  default     = ""
-}
-
-variable "node_name" {
-  type        = string
-  description = "The name of the Proxmox node where the image will be downloaded."
+  default     = null
 }
 
 variable "datastore_id" {
+  description = "The ID of the datastore where the cloud image will be stored."
   type        = string
-  description = "The ID of the Proxmox datastore where the image will be stored."
+  default     = "local"
+  nullable    = false
 }

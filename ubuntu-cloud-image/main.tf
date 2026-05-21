@@ -1,55 +1,46 @@
 locals {
-  base_url = "${var.cloud_image_repository_url}/releases/${var.ubuntu_version}/release${var.serial != "" ? "-${var.serial}" : ""}"
-
-  # Filenames
+  base_url            = "${var.cloud_image_mirror}/releases/${var.ubuntu_version}/release${var.build_serial != "" ? "-${var.build_serial}" : ""}"
   checksum_filename   = "SHA256SUMS"
   build_info_filename = "unpacked/build-info.txt"
   image_filename      = "ubuntu-${var.ubuntu_version}-server-cloudimg-${var.architecture}.img"
+
+  build_info_url = "${local.base_url}/${local.build_info_filename}"
 }
 
 data "external" "image_build_info" {
-  program = ["bash", "${path.module}/scripts/get_build_info.sh"]
+  program = ["bash", "${path.module}/get_build_info.sh"]
 
   query = {
-    url = "${local.base_url}/${local.build_info_filename}"
+    url = local.build_info_url
   }
 }
 
 data "external" "image_checksum" {
-  program = ["bash", "${path.module}/scripts/get_checksum.sh"]
+  program = ["bash", "${path.module}/get_checksum.sh"]
 
   query = {
-    url      = "${local.base_url}/${local.checksum_filename}"
-    filename = local.image_filename
+    url   = "${local.base_url}/${local.checksum_filename}"
+    image = local.image_filename
   }
 }
 
 locals {
   cloud_image_url      = "${local.base_url}/${local.image_filename}"
   cloud_image_checksum = data.external.image_checksum.result.checksum
-  cloud_image_serial   = data.external.image_build_info.result.serial
+  build_serial         = data.external.image_build_info.result.serial
 }
 
-resource "random_pet" "random_pet" {
-  length = 1
-}
-
-resource "proxmox_virtual_environment_download_file" "ubuntu_cloud_image" {
-  depends_on = [
-    data.external.image_build_info,
-    data.external.image_checksum,
-  ]
-
-  content_type        = "iso"
+resource "proxmox_download_file" "ubuntu_cloud_image" {
+  content_type        = "import"
   overwrite           = true
   overwrite_unmanaged = false
 
   url       = local.cloud_image_url
-  file_name = "ubuntu-${var.ubuntu_version}-${local.cloud_image_serial}-server-cloudimg-${var.architecture}-${random_pet.random_pet.id}.img"
+  file_name = "ubuntu-${var.ubuntu_version}-${local.build_serial}-server-cloudimg-${var.architecture}.qcow2"
 
   checksum           = local.cloud_image_checksum
   checksum_algorithm = "sha256"
 
   datastore_id = var.datastore_id
-  node_name    = var.node_name
+  node_name    = var.proxmox_node_name
 }

@@ -1,0 +1,7 @@
+---
+haproxy_frontends: []
+haproxy_backends: []
+haproxy_global_maxconn: 4096
+haproxy_default_timeout_connect: 5s
+haproxy_default_timeout_client: 50s
+haproxy_default_timeout_server: 50s

@@ -1,57 +1,74 @@
-variable "node_name" {
+# Required Variables
+
+variable "proxmox_node_name" {
   type        = string
-  description = "Name of the Proxmox node where the userdata file will be created."
+  description = "The name of the Proxmox node to use for storing the cloud-init user data file."
 }
 
-variable "datastore_id" {
+variable "name" {
   type        = string
-  description = "Datastore ID for the userdata file. Defaults to 'local'."
+  description = "The name of the cloud-init user data file to create."
+}
+
+variable "userdata_hostname" {
+  type        = string
+  description = "The hostname to set in the cloud-init user data file."
+}
+
+# Optional Variables
+
+variable "proxmox_datastore_id" {
+  type        = string
+  description = "The ID of the Proxmox datastore to use for storing the cloud-init user data file."
+  default     = "local"
+  nullable    = false
+}
+
+variable "userdata_ssh_key" {
+  type        = string
+  description = "The SSH public key to add to the cloud-init user data file for the specified user."
   default     = ""
+  nullable    = false
 }
 
-variable "file_name" {
+variable "userdata_ssh_import_id" {
   type        = string
-  description = "Name of the userdata file to be created."
-}
-
-variable "hostname" {
-  type        = string
-  description = "Hostname for the VM."
-}
-
-variable "username" {
-  type        = string
-  description = "Username for the Cloud-Init user. Defaults to 'ubuntu'."
-  default     = "ubuntu"
-}
-
-variable "password" {
-  type        = string
-  description = "Password for the Cloud-Init user."
+  description = "The SSH import ID to use for importing SSH keys into the cloud-init user data file."
   default     = ""
-  sensitive   = true
+  nullable    = false
 }
 
-variable "ssh_key" {
+variable "userdata_username" {
   type        = string
-  description = "SSH public key for the Cloud-Init user."
-  default     = ""
+  description = "The username to create in the cloud-init user data file."
+  default     = "cmsrobotics"
+  nullable    = false
 }
 
-variable "ssh_import_id" {
+variable "userdata_password" {
   type        = string
-  description = "SSH import ID for the Cloud-Init user."
+  description = "The password to set for the specified user in the cloud-init user data file. Note: This is not recommended for production use."
   default     = ""
+  nullable    = false
 }
 
-variable "additional_packages" {
+variable "userdata_ssh_pwauth" {
+  type        = bool
+  description = "Whether to enable SSH password authentication in the cloud-init user data file."
+  default     = false
+  nullable    = false
+}
+
+variable "userdata_additional_packages" {
   type        = list(string)
-  description = "List of additional packages to install."
+  description = "A list of additional packages to install in the cloud-init user data file."
   default     = []
+  nullable    = false
 }
 
-variable "apt_mirror" {
+variable "userdata_apt_mirror" {
   type        = string
-  description = "APT mirror URL to use for package installation. Leave empty to use default mirrors."
+  description = "The APT mirror to use in the cloud-init user data file."
   default     = ""
+  nullable    = false
 }

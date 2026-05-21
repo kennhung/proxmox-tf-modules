@@ -1,5 +1,4 @@
 #cloud-config
-
 hostname: ${hostname}
 fqdn: ${hostname}.lan
 manage_etc_hosts: false
@@ -12,7 +11,8 @@ user: ${username}
 %{ if password != "" }password: ${password}
 chpasswd:
   expire: false
-ssh_pwauth: true%{ endif }
+%{ endif }
+%{ if ssh_pwauth != "" }ssh_pwauth: ${ssh_pwauth}%{ endif }
 
 package_upgrade: true
 package_reboot_if_required: true

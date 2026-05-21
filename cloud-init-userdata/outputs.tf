@@ -1,3 +1,4 @@
-output "userdata_file_id" {
-  value = proxmox_virtual_environment_file.cloud_init_userdata.id
+output "file_id" {
+  description = "The ID of the uploaded cloud-init user data file."
+  value       = proxmox_virtual_environment_file.cloud_init_userdata.id
 }

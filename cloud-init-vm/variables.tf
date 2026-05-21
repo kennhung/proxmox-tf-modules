@@ -1,38 +1,18 @@
-variable "vmid" {
-  type        = number
-  description = "Proxmox VMID for the virtual machine."
-}
+# Required Variables
 
 variable "node_name" {
   type        = string
-  description = "Name of the Proxmox node where the VM will be created."
+  description = "The name of the Proxmox node to use."
+}
+
+variable "vm_id" {
+  type        = number
+  description = "The VM ID to use for the new virtual machine."
 }
 
 variable "name" {
   type        = string
-  description = "Name of the Proxmox VM."
-}
-
-variable "description" {
-  type        = string
-  description = "Description of the Proxmox VM."
-  default     = "Managed by Terraform"
-}
-
-variable "started" {
-  type        = bool
-  description = "Whether to start the virtual machine."
-  default     = true
-}
-
-variable "cpu_cores" {
-  type        = number
-  description = "Number of CPU cores for the VM."
-}
-
-variable "memory_mb" {
-  type        = number
-  description = "Amount of memory in MB for the VM."
+  description = "The name of the new virtual machine."
 }
 
 variable "default_network" {
@@ -41,7 +21,81 @@ variable "default_network" {
     ipv4_address = string
     ipv4_gateway = string
   })
-  description = "Default network configuration for the VM."
+  description = "The default network configuration for the new virtual machine."
+}
+
+variable "bootdisk" {
+  type = object({
+    datastore_id   = optional(string, "local-lvm")
+    file_id        = optional(string, null)
+    import_from    = optional(string, null)
+    interface_type = optional(string, "scsi")
+    size           = optional(number, 20)
+  })
+  description = "The boot disk configuration for the new virtual machine."
+
+  validation {
+    condition     = (var.bootdisk.file_id != null) != (var.bootdisk.import_from != null)
+    error_message = "Exactly one of file_id or import_from must be provided for the bootdisk."
+  }
+}
+
+# Optional Variables
+
+variable "description" {
+  type        = string
+  description = "The description for the new virtual machine."
+  default     = "Managed by Terraform"
+  nullable    = false
+}
+
+variable "tags" {
+  type        = list(string)
+  description = "A list of tags to assign to the new virtual machine."
+  default     = []
+  nullable    = false
+}
+
+variable "no_default_tags" {
+  type        = bool
+  description = "Whether to exclude default tags."
+  default     = false
+  nullable    = false
+}
+
+variable "pool_id" {
+  type        = string
+  description = "The ID of the Proxmox pool to assign the new virtual machine to."
+  default     = ""
+  nullable    = false
+}
+
+variable "started" {
+  type        = bool
+  description = "Whether the vm is started."
+  default     = true
+  nullable    = false
+}
+
+variable "cpu_cores" {
+  type        = number
+  description = "The number of CPU cores to assign to the new virtual machine."
+  default     = 2
+  nullable    = false
+}
+
+variable "cpu_type" {
+  type        = string
+  description = "The CPU type to assign to the new virtual machine."
+  default     = "kvm64"
+  nullable    = false
+}
+
+variable "memory_mb" {
+  type        = number
+  description = "The amount of memory (in MB) to assign to the new virtual machine."
+  default     = 2048
+  nullable    = false
 }
 
 variable "additional_networks" {
@@ -50,69 +104,37 @@ variable "additional_networks" {
     ipv4_address = string
     ipv4_gateway = optional(string, "")
   }))
-  description = "Additional network configurations for the VM."
+  description = "A list of additional network configurations for the new virtual machine."
   default     = []
+  nullable    = false
 }
 
-variable "dns_servers" {
-  type        = list(string)
-  description = "List of DNS servers for the VM. Defaults to node's DNS servers."
+variable "additional_disks" {
+  type = list(object({
+    datastore_id   = optional(string, "local-lvm")
+    interface_type = optional(string, "scsi")
+    size           = number
+  }))
+  description = "A list of additional disk configurations for the VM."
   default     = []
-}
-
-variable "bootdisk" {
-  type = object({
-    datastore_id = string
-    file_id      = string
-    size         = optional(number, 20)
-  })
-  description = "Configuration for the boot disk of the VM."
+  nullable    = false
 }
 
 variable "cloud_init_datastore_id" {
   type        = string
-  description = "Datastore ID for the Cloud-Init configuration."
+  description = "The ID of the Proxmox datastore to use for cloud-init configuration."
+  default     = "local-lvm"
+  nullable    = false
 }
 
-variable "userdata_file_datastore_id" {
-  type        = string
-  description = "Datastore ID for the userdata file."
-  default     = ""
-}
-
-variable "username" {
-  type        = string
-  description = "Username for the Cloud-Init user. Defaults to 'ubuntu'."
-  default     = "ubuntu"
-}
-
-variable "password" {
-  type        = string
-  description = "Password for the Cloud-Init user."
-  default     = ""
-  sensitive   = true
-}
-
-variable "ssh_key" {
-  type        = string
-  description = "SSH public key for the Cloud-Init user."
-  default     = ""
-}
-
-variable "ssh_import_id" {
-  type        = string
-  description = "SSH import ID for the Cloud-Init user."
-  default     = ""
-}
-
-variable "additional_packages" {
+variable "dns_servers" {
   type        = list(string)
-  description = "List of additional packages to install."
+  description = "A list of DNS server addresses to assign to the new virtual machine."
   default     = []
 }
 
-variable "apt_mirror" {
+variable "user_data_file_id" {
   type        = string
-  description = "APT mirror URL to use for package installation. Leave empty to use default mirrors."
-  default     = ""
+  description = "The ID of the cloud-init user data file."
+  default     = null
 }

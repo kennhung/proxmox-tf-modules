@@ -1,36 +1,18 @@
-module "userdata_file" {
-  source = "../cloud-init-userdata"
-
-  node_name    = var.node_name
-  datastore_id = var.userdata_file_datastore_id
-  file_name    = "${var.vmid}-userdata.yaml"
-
-  hostname = var.name
-
-  username      = var.username
-  password      = var.password
-  ssh_key       = var.ssh_key
-  ssh_import_id = var.ssh_import_id
-
-  additional_packages = var.additional_packages
-  apt_mirror          = var.apt_mirror
-}
-
-resource "proxmox_virtual_environment_vm" "proxmox_vm" {
+resource "proxmox_virtual_environment_vm" "cloud_init_vm" {
   node_name = var.node_name
-  vm_id     = var.vmid
+  vm_id     = var.vm_id
 
   name        = var.name
   description = var.description
-  tags        = ["terraform"]
-  on_boot     = true
-  migrate     = true
+  tags        = var.no_default_tags ? var.tags : concat(["terraform", "cloud-init"], var.tags)
+  pool_id     = var.pool_id
 
+  on_boot = var.started
   started = var.started
 
   cpu {
     cores = var.cpu_cores
-    type  = "x86-64-v2-AES"
+    type  = var.cpu_type
   }
 
   memory {
@@ -52,15 +34,23 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
     content {
       bridge = network_device.value.bridge_name
     }
-
   }
 
   disk {
     datastore_id = var.bootdisk.datastore_id
     file_id      = var.bootdisk.file_id
-    file_format  = "raw"
-    interface    = "scsi0"
+    import_from  = var.bootdisk.import_from
+    interface    = "${var.bootdisk.interface_type}0"
     size         = var.bootdisk.size
+  }
+
+  dynamic "disk" {
+    for_each = var.additional_disks
+    content {
+      datastore_id = disk.value.datastore_id
+      interface    = "${disk.value.interface_type}${disk.key + 1}"
+      size         = disk.value.size
+    }
   }
 
   operating_system {
@@ -73,7 +63,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
     ip_config {
       ipv4 {
         address = var.default_network.ipv4_address
-        gateway = var.default_network.ipv4_gateway
+        gateway = var.default_network.ipv4_address == "dhcp" ? null : var.default_network.ipv4_gateway
       }
       ipv6 {
         address = "dhcp"
@@ -86,7 +76,7 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
       content {
         ipv4 {
           address = ip_config.value.ipv4_address
-          gateway = ip_config.value.ipv4_gateway
+          gateway = ip_config.value.ipv4_address == "dhcp" ? null : ip_config.value.ipv4_gateway
         }
         ipv6 {
           address = "dhcp"
@@ -98,6 +88,10 @@ resource "proxmox_virtual_environment_vm" "proxmox_vm" {
       servers = var.dns_servers
     }
 
-    user_data_file_id = module.userdata_file.userdata_file_id
+    user_data_file_id = var.user_data_file_id
+  }
+
+  lifecycle {
+    ignore_changes = [node_name, hostpci, disk[0].file_id]
   }
 }
