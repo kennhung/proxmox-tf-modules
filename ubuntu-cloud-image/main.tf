@@ -1,5 +1,5 @@
 locals {
-  base_url            = "${var.cloud_image_mirror}/releases/${var.ubuntu_version}/release${var.build_serial != "" ? "-${var.build_serial}" : ""}"
+  base_url            = "${var.cloud_image_mirror}/releases/${var.ubuntu_version}/release${var.build_serial != null ? "-${var.build_serial}" : ""}"
   checksum_filename   = "SHA256SUMS"
   build_info_filename = "unpacked/build-info.txt"
   image_filename      = "ubuntu-${var.ubuntu_version}-server-cloudimg-${var.architecture}.img"
