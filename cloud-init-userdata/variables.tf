@@ -57,8 +57,7 @@ variable "userdata_password" {
 variable "userdata_ssh_pwauth" {
   type        = bool
   description = "Whether to enable SSH password authentication in the cloud-init user data file."
-  default     = false
-  nullable    = false
+  default     = null
 }
 
 variable "userdata_additional_packages" {
