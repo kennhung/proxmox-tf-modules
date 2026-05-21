@@ -43,7 +43,7 @@ variable "userdata_ssh_import_id" {
 variable "userdata_username" {
   type        = string
   description = "The username to create in the cloud-init user data file."
-  default     = "cmsrobotics"
+  default     = "ubuntu"
   nullable    = false
 }
 
