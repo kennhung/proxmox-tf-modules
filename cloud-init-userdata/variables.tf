@@ -10,17 +10,19 @@ variable "name" {
   description = "The name of the cloud-init user data file to create."
 }
 
-variable "userdata_hostname" {
-  type        = string
-  description = "The hostname to set in the cloud-init user data file."
-}
-
 # Optional Variables
 
 variable "proxmox_datastore_id" {
   type        = string
   description = "The ID of the Proxmox datastore to use for storing the cloud-init user data file."
   default     = "local"
+  nullable    = false
+}
+
+variable "userdata_hostname" {
+  type        = string
+  description = "The hostname to set in the cloud-init user data file."
+  default     = ""
   nullable    = false
 }
 
