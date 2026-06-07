@@ -8,7 +8,13 @@ variable "ip_addr" {}
 
 variable "gw" {}
 
-variable "file_id" {}
+variable "import_from" {}
+
+variable "password" {}
+
+variable "vendor_data_file_id" {
+  default = null
+}
 
 module "ubuntu_vm" {
   source = "../.."
@@ -29,7 +35,13 @@ module "ubuntu_vm" {
 
   bootdisk = {
     datastore_id = "local-lvm"
-    file_id      = var.file_id
+    import_from  = var.import_from
     size         = 20
   }
+
+  user_account = {
+    password = var.password
+  }
+
+  vendor_data_file_id = var.vendor_data_file_id
 }

@@ -21,7 +21,7 @@ resource "proxmox_virtual_environment_vm" "cloud_init_vm" {
   }
 
   agent {
-    enabled = true
+    enabled = var.guest_agent
   }
 
   network_device {
@@ -88,7 +88,18 @@ resource "proxmox_virtual_environment_vm" "cloud_init_vm" {
       servers = var.dns_servers
     }
 
-    user_data_file_id = var.user_data_file_id
+    dynamic "user_account" {
+      for_each = var.user_account != null ? [var.user_account] : []
+
+      content {
+        keys     = user_account.value.ssh_keys
+        username = user_account.value.username
+        password = user_account.value.password
+      }
+    }
+
+    user_data_file_id   = var.user_data_file_id
+    vendor_data_file_id = var.vendor_data_file_id
   }
 
   lifecycle {

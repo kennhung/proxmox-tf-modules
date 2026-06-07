@@ -120,6 +120,13 @@ variable "additional_disks" {
   nullable    = false
 }
 
+variable "guest_agent" {
+  type        = bool
+  description = "Whether to enable the QEMU guest agent for the new virtual machine."
+  default     = true
+  nullable    = false
+}
+
 variable "cloud_init_datastore_id" {
   type        = string
   description = "The ID of the Proxmox datastore to use for cloud-init configuration."
@@ -133,8 +140,35 @@ variable "dns_servers" {
   default     = []
 }
 
+variable "user_account" {
+  type = object({
+    ssh_keys = optional(list(string), [])
+    username = optional(string, null)
+    password = optional(string, null)
+  })
+  description = "The user account configuration for the new virtual machine. If username or password is provided, both must be provided."
+  default     = null
+}
+
 variable "user_data_file_id" {
   type        = string
   description = "The ID of the cloud-init user data file."
   default     = null
+
+  validation {
+    condition     = var.user_data_file_id == null || var.user_account == null
+    error_message = "If user_data_file_id is provided, cloud_init_datastore_id must also be provided."
+  }
+}
+
+variable "vendor_data_file_id" {
+  type        = string
+  description = "The ID of the cloud-init vendor data file."
+  default     = null
+}
+
+variable "upgrade" {
+  type        = bool
+  description = "Whether to perform a package upgrade on the new virtual machine during cloud-init."
+  default     = true
 }
