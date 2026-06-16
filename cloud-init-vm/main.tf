@@ -59,6 +59,7 @@ resource "proxmox_virtual_environment_vm" "cloud_init_vm" {
 
   initialization {
     datastore_id = var.cloud_init_datastore_id
+    upgrade      = var.upgrade
 
     ip_config {
       ipv4 {
