@@ -1,4 +1,15 @@
 resource "proxmox_virtual_environment_container" "ubuntu_container" {
+  lifecycle {
+    precondition {
+      condition     = var.clone != null || var.template_file_id != null
+      error_message = "Either 'clone' or 'template_file_id' must be provided."
+    }
+    precondition {
+      condition     = !(var.clone != null && var.template_file_id != null)
+      error_message = "'clone' and 'template_file_id' are mutually exclusive."
+    }
+  }
+
   node_name = var.node_name
   vm_id     = var.vm_id
 
@@ -86,8 +97,20 @@ resource "proxmox_virtual_environment_container" "ubuntu_container" {
     }
   }
 
-  operating_system {
-    template_file_id = var.template_file_id
-    type             = "ubuntu"
+  dynamic "clone" {
+    for_each = var.clone != null ? [var.clone] : []
+    content {
+      vm_id        = clone.value.vm_id
+      node_name    = clone.value.node_name
+      datastore_id = clone.value.datastore_id
+    }
+  }
+
+  dynamic "operating_system" {
+    for_each = var.clone == null ? [1] : []
+    content {
+      template_file_id = var.template_file_id
+      type             = "ubuntu"
+    }
   }
 }

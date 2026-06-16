@@ -26,7 +26,18 @@ variable "default_network" {
 
 variable "template_file_id" {
   type        = string
-  description = "The ID of the Proxmox template file to use for the new container."
+  description = "The ID of the Proxmox template file to use for the new container. Required when not cloning."
+  default     = null
+}
+
+variable "clone" {
+  type = object({
+    vm_id        = number
+    node_name    = optional(string, null)
+    datastore_id = optional(string, null)
+  })
+  description = "Clone an existing container instead of creating from a template. Mutually exclusive with template_file_id."
+  default     = null
 }
 
 # Optional Variables
