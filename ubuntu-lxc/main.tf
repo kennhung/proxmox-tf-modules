@@ -14,7 +14,7 @@ resource "proxmox_virtual_environment_container" "ubuntu_container" {
   vm_id     = var.vm_id
 
   description = var.description
-  tags        = var.no_default_tags ? var.tags : concat(["terraform", "lxc"], var.tags)
+  tags        = var.no_default_tags ? var.tags : concat(["terraform"], var.tags)
   pool_id     = var.pool_id
   protection  = var.protection
 
